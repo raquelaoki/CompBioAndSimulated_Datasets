@@ -50,6 +50,7 @@ class goPDX:
                 self.x_clinical_names = np.load(self.path+'x_clinical_names.npy', allow_pickle=True)
                 self.x_snps = np.load(self.path+'x_snps.npy', allow_pickle=True)
                 self.x_snps_names = np.load(self.path+'x_colnames.npy', allow_pickle=True)
+                self.known_snps = pd.read_csv(self.path + 'known_snps_fullname.txt', header=None)[0].values
                 print('Target Y: ', len(self.y), ' items and ', sum(self.y), ' positive examples')
                 print('Clinical: ', self.x_clinical.shape[0], 'items and ', len(self.x_clinical_names),' columns')
                 print('SNPS: ', self.x_snps.shape[0], 'items and ', len(self.x_snps_names),' columns')
