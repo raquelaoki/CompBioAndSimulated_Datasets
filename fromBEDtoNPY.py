@@ -15,24 +15,13 @@ Example:
     goPDX()
 """
 
-from pandas_plink import read_plink1_bin
-import os
 import numpy as np
 import pandas as pd
 import time
-import allel
+import sys
 from scipy.spatial.distance import squareform
-import operator
-import functools
 from scipy.sparse import coo_matrix, vstack
 from scipy import sparse
-
-# TODO: Remove these paths
-#path_input = path_raw = "Cisplatin-induced_ototoxicity"
-#path_output = ""
-#path_output_simulated = "CompBioAndSimulated_Datasets\\data\\"
-#known_snps_path = 'CompBioAndSimulated_Datasets\\data\\known_snps.txt'
-#ks = pd.read_csv(known_snps_path, header=None)[0].values
 
 
 class goPDX:
@@ -41,33 +30,47 @@ class goPDX:
     Working only with dominant encoding
     read files from npz
     """
-
     def __init__(self, path="/content/", clinicalName='clinical_01Mar2021.xlsx',
-                 tag='snpsback_', save_files=False, read_raw = False, path_raw = ''):
+                 tag='snpsback_', save_files=False, read_raw=False, path_raw='', final=True):
         super(goPDX, self).__init__()
         self.read_raw = read_raw
         self.path_raw = path_raw
         if self.read_raw:
+            print('Loading raw form')
             load_raw_bed()
-
-
-
         self.path = path
         self.clinicalName = clinicalName
         self.tag = tag
-        clinical, self.data, self.variants_names, self.cadd_score, self.samples_names, self.known_snp = \
-            self.loading_preprocessed(save_files)
-        self.y, self.clinical, self.clinical_names = self.loading_clinical(clinical)
-        saving_preprocessed(save_files)
+        if final:
+            print('Loading final form:')
+            try:
+                self.y = np.load(self.path+'y.npy')
+                x_clinical = np.load(self.path+'x_clinical.npy', allow_pickle=True)
+                self.x_clinical = x_clinical.astype('float64')
+                self.x_clinical_names = np.load(self.path+'x_clinical_names.npy', allow_pickle=True)
+                self.x_snps = np.load(self.path+'x_snps.npy', allow_pickle=True)
+                self.x_snps_names = np.load(self.path+'x_colnames.npy', allow_pickle=True)
+                print('Target Y: ', len(self.y), ' items and ', sum(self.y), ' positive examples')
+                print('Clinical: ', self.x_clinical.shape[0], 'items and ', len(self.x_clinical_names),' columns')
+                print('SNPS: ', self.x_snps.shape[0], 'items and ', len(self.x_snps_names),' columns')
+            except FileNotFoundError:
+                print('ERRROR: y.npy,x_clinical.npy, x_clinical_names.npy, x_snps, or  x_colnames missing from Colab')
+                sys.exit(1)
+        else:
+            print('Loading intermidiated form')
+            clinical, self.data, self.variants_names, self.cadd_score, self.samples_names, self.known_snp = \
+                self.loading_preprocessed(save_files)
+            self.y, self.clinical, self.clinical_names = self.loading_clinical(clinical)
+            saving_preprocessed(save_files)
 
-
-    def loading_preprocessed(self, save_files=False):
+    def loading_preprocessed(self, final=True):
 
         # Loading files
         try:
             clinical = pd.read_excel(self.clinicalName)  # new data set
         except FileNotFoundError:
             print('ERROR: ', self.clinicalName, ' missing from Colab')
+            sys.exit(1)
 
         try:
             data = sparse.load_npz(self.path + self.tag + 'gt_dominant.npz')  # gt following snps and variants order
@@ -77,6 +80,7 @@ class goPDX:
             known_snps = pd.read_csv(self.path + 'known_snps_fullname.txt', header=None)[0].values  # known snps
         except FileNotFoundError:
             print('ERRROR: gt_dominant,samples, cadd, variants or known_snps_fullname missing from Colab')
+            sys.exit(1)
 
         clinical = self.clinical_filtering(clinical)
         data, samples_names = self.update_data_after_clinical_filtering(data, samples_names, clinical_)
@@ -166,17 +170,18 @@ class goPDX:
     def raw_cadd(self):
         print('LOADING CADD')
         # os.chdir(path_input)
-        cadd = pd.read_csv(self.path_raw+'Peds_CIO_merged_qc_CADD.txt', sep=" ")
+        cadd = pd.read_csv(self.path_raw + 'Peds_CIO_merged_qc_CADD.txt', sep=" ")
         cadd['variants'] = cadd['#CHROM'].astype(str) + "_" + cadd['ID']
         return cadd.iloc[:, [6, 5]]
 
     def load_raw_bed(self):
+        from pandas_plink import read_plink1_bin
         print('WARNING: THESE FUNCTIONS ARE VERY TIME CONSUMING. IT MIGHT TAKE UP TO 48 h')
         # read parts of bed values https://github.com/limix/pandas-plink/blob/master/doc/usage.rst
         # https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas
         """Loading Files"""
         # os.chdir(path_input)
-        G = read_plink1_bin(self.path_raw+"Peds_CIO_merged_qc_data.bed", bim=None, fam=None, verbose=False)
+        G = read_plink1_bin(self.path_raw + "Peds_CIO_merged_qc_data.bed", bim=None, fam=None, verbose=False)
         samples = G.sample.values  # samples
         variants = G.variant.values
         s, v = len(samples), len(variants)
@@ -205,7 +210,6 @@ class goPDX:
         data_d, data_s, variants_, cadd_ = self.filteringSNPS(np.array(variants_), np.array(cadd_), samples, G, '', 0.2)
         fixing_erros()
         adding_known_snps_back(G, samples, variants_, cadd_, cadd_sort, data_d, data_s)
-
 
     def filteringSNPS(self, variants, cadd_sorted, samples, G, name, thold=0.05, interval=10000):
         """preparing variables"""
@@ -280,7 +284,6 @@ class goPDX:
         print('Total time in minutes: ', round((time.time() - start0) / 60, 2))
         return data_d, data_s, variants_done, cadd_done
 
-
     def fixing_erros(self, tag=''):
         """Fixing Errors"""
         data_df = sparse.load_npz(self.path + tag + 'gt_dominant.npz')
@@ -298,8 +301,7 @@ class goPDX:
         # row_d = row_d * 1
         sparse.save_npz(path_output + tag + 'gt_dominant.npz', coo_matrix(row_d))
 
-
-    def adding_known_snps_back(self, G, samples, variants_, cadd_,cadd_sort, data_df, data_sf):
+    def adding_known_snps_back(self, G, samples, variants_, cadd_, cadd_sort, data_df, data_sf):
         known_snps = pd.read_csv(self.path + 'known_snps_fullname.txt', header=None)[0].values
 
         """Adding known SNPS back"""
@@ -379,7 +381,7 @@ def eliminate_low_cadd(data, variants_name, cadd_score, ks_f):
         if not sum_df_greater[i]:
             remove.append(i)
 
-    #data_df_ = data_df  # .todense().transpose()
+    # data_df_ = data_df  # .todense().transpose()
     print('Original Shape Before Filtering: Data', data.shape, ', variants ', variants_name.shape,
           ', Cadd', cadd_score.shape, ', Ks', ks_f.shape)
     data = np.delete(data, remove, axis=1)
@@ -400,6 +402,7 @@ def ld_prune(gn, variants, cadd, thold):
         subset of the input subset without high correlated snps and cadd above 1
 
     """
+    import allel
     # https://en.wikipedia.org/wiki/Linkage_disequilibrium
     # Estimate the linkage disequilibrium parameter r for each pair of variants
     r = allel.rogers_huff_r(gn)
@@ -454,6 +457,3 @@ def ld_prune(gn, variants, cadd, thold):
     variants = variants[keep]
     cadd = cadd[keep]
     return gn, variants, cadd
-
-
-
