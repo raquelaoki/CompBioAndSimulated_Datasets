@@ -19,6 +19,7 @@ class gwas_simulated_data(object):
         self.pca_path = pca_path
         self.S = np.loadtxt(self.pca_path, delimiter=',')
         self.prop_tc = prop_tc
+        print('GWAS simulated data initialized!')
 
     def generate_samples(self):
         """
@@ -97,6 +98,9 @@ class gwas_simulated_data(object):
         G, col = self.add_colnames(G0, tc)
         # print('im here', G.shape)
         y = y0 + y1 + y2
+        print('... Treatments: ', len(col))
+        print('... Confounders: ', G.shape[1]-len(col))
+        print(' Data Simulation Done!')
         return G, tc, y01, y, col
 
     def add_colnames(self, data, truecauses):
@@ -139,7 +143,7 @@ class copula_simulated_data(object):
         self.tau_nl = tau_nl  # non linear effect coef
         self.coef_true = np.concatenate([tau_l, tau_nl], axis=0)
         self.n = n  # sample size
-        print('Copula Simulaterd data initialized!')
+        print('Copula simulated data initialized!')
 
     def g_yt(self, t, tau_l, tau_nl, ind=2):
         """
@@ -154,7 +158,6 @@ class copula_simulated_data(object):
         return y
 
     def generate_samples(self):
-        print('Start: Copula Dataset simulation')
         u = np.random.normal(loc=0, scale=1, size=self.n * self.s).reshape(self.n, self.s)
         if self.s > 1:
             pca = PCA(n_components=1)
@@ -204,15 +207,15 @@ class copula_simulated_data(object):
         ytilde_mean_obs = ytilde_mean_do.reshape(self.k + 1, 1) + ytilde_mean_do_bias
         y_mean_obs = scipy.stats.norm.cdf(ytilde_mean_obs / sigma_ytilde_t)
         effect_obs = (y_mean_obs[0:4] / y_mean_obs[4]).reshape(1, self.k)
-        print('Start: Copula True Treatment Effects')
-        print("... True effect", effect_true)
-        print("... True obs effect", effect_obs)
+        #print('Start: Copula True Treatment Effects')
+        #print("... True effect", effect_true)
+        #print("... True obs effect", effect_obs)
 
-        print('\n... Binary Nonlinear:')
+        #print('\n... Binary Nonlinear:')
         # print("B: True treat. effect", ytilde_mean_do_bias.reshape(1,k+1))
-        print("... B: True treat. obs effect", ytilde_mean_obs.reshape(1, self.k + 1))
+        #print("... B: True treat. obs effect", ytilde_mean_obs.reshape(1, self.k + 1))
 
-        print('\n... Continuous Nonlinear')
+        # print('\n... Continuous Nonlinear')
         # true treatment effect #
         effect_true_c = self.g_yt(t_choice, self.tau_l, self.tau_nl) - self.g_yt(t2, self.tau_l, self.tau_nl)
         # true treatment effect bias #
@@ -220,7 +223,7 @@ class copula_simulated_data(object):
         # true observed treatment effect #
         effect_obs_c = effect_true_c.reshape(1, self.k) + effect_bias_c
         # print("C: True treat. effect", effect_bias_c)
-        print("... C: True treat. obs effect", effect_obs_c)
+        # print("... C: True treat. obs effect", effect_obs_c)
         # return effect_true, effect_obs, ytilde_mean_obs.reshape(1, self.k + 1), effect_obs_c
         return effect_obs_c
 
