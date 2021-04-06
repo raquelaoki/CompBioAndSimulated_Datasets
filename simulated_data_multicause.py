@@ -12,7 +12,7 @@ class gwas_simulated_data(object):
     # Reference:
     # https://github.com/raquelaoki/ParKCa/blob/master/src/datapreprocessing.py
 
-    def __init__(self, n_units=1000, n_causes=10, seed=4, pca_path='data//tgp_pca2.txt', prop_tc=0.1):
+    def __init__(self, n_units=10000, n_causes=10, seed=4, pca_path='data//tgp_pca2.txt', prop_tc=0.1):
         self.n_units = n_units
         self.n_causes = n_causes
         self.seed = seed
@@ -30,10 +30,10 @@ class gwas_simulated_data(object):
         Due running time, we save the files and load from the pca.txt file
         """
         G0, lambdas = self.sim_genes_TGP(D=3)
-        G1, tc, y01, col = self.sim_dataset(G0, lambdas, self.prop_tc)
+        G1, tc, y01, y, col = self.sim_dataset(G0, lambdas, self.prop_tc)
         # G, col = self.add_colnames(G1,tc)
         del G0
-        return y01, tc, G1, col
+        return G1, y, y01, col, tc
 
     def sim_genes_TGP(self, D):
         """
@@ -96,7 +96,8 @@ class gwas_simulated_data(object):
         y01 = np.asarray(y01)
         G, col = self.add_colnames(G0, tc)
         # print('im here', G.shape)
-        return G, tc, y01, col
+        y = y0 + y1 + y2
+        return G, tc, y01, y, col
 
     def add_colnames(self, data, truecauses):
         """
@@ -125,7 +126,7 @@ class copula_simulated_data(object):
     # https://github.com/JiajingZ/CopulaSensitivity/blob/CopSens/simulation/GaussianT_BinaryY_nonlinearYT/GaussianT_BinaryY_nonlinearYT_RR.R
     # adapted from R to python
     def __init__(self, k=4, s=1, B=[2, 0.5, -0.4, 0.2], gamma=2.8, sigma2_t=1, sigma2_y=1, tau_l=[3, -1, 1, -0.06],
-                 tau_nl=[-4], n=8000):
+                 tau_nl=[-4], n=10000):
 
         self.k = k  # number of treatments
         self.s = s  # number of confounders
@@ -152,7 +153,7 @@ class copula_simulated_data(object):
             y = y + pow(t[:, i], 2) * item
         return y
 
-    def get_data(self):
+    def generate_samples(self):
         print('Start: Copula Dataset simulation')
         u = np.random.normal(loc=0, scale=1, size=self.n * self.s).reshape(self.n, self.s)
         if self.s > 1:
@@ -171,10 +172,11 @@ class copula_simulated_data(object):
         print('... Treatments:', tr.shape)
         # print(tr.head())
         print('... Confounders:', u.shape)
+        X = np.concatenate([tr, u], axis-1)
         # print(u[0:5,:])
         print('... Use .get_true_coefs() to obtain the treatment effects (returns 4 elements)')
         print('Data Simulation Done!')
-        return tr, u, y_continuous, y_binary
+        return X, y_continuous, y_binary, list(range(tr.shape[1])), self.get_true_coefs()
 
     def get_true_coefs(self):
         aux1 = np.linalg.solve(np.array(self.B).reshape(self.k, 1) * (
@@ -220,8 +222,8 @@ class copula_simulated_data(object):
         effect_obs_c = effect_true_c.reshape(1, self.k) + effect_bias_c
         # print("C: True treat. effect", effect_bias_c)
         print("... C: True treat. obs effect", effect_obs_c)
-
-        return effect_true, effect_obs, ytilde_mean_obs.reshape(1, self.k + 1), effect_obs_c
+        # return effect_true, effect_obs, ytilde_mean_obs.reshape(1, self.k + 1), effect_obs_c
+        return effect_obs_c
 
     def print_equation(self):
         eq = 'g(T)='
