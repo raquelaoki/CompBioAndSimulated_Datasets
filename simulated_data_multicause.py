@@ -156,6 +156,7 @@ class copula_simulated_data(object):
     def generate_samples(self):
         print('Start: Copula Dataset simulation')
         u = np.random.normal(loc=0, scale=1, size=self.n * self.s).reshape(self.n, self.s)
+        print('here',u.shape, self.s)
         if self.s > 1:
             pca = PCA(n_components=1)
             u1 = pca.fit_transform(u)
