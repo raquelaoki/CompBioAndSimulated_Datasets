@@ -156,7 +156,6 @@ class copula_simulated_data(object):
     def generate_samples(self):
         print('Start: Copula Dataset simulation')
         u = np.random.normal(loc=0, scale=1, size=self.n * self.s).reshape(self.n, self.s)
-        print('here',u.shape, self.s)
         if self.s > 1:
             pca = PCA(n_components=1)
             u1 = pca.fit_transform(u)
@@ -173,7 +172,7 @@ class copula_simulated_data(object):
         print('... Treatments:', tr.shape)
         # print(tr.head())
         print('... Confounders:', u.shape)
-        X = np.concatenate([tr.values, u.values], 1)
+        X = np.concatenate([tr.values, u], 1)
         # print(u[0:5,:])
         print('Data Simulation Done!')
         return X, y_continuous, y_binary, list(range(tr.shape[1])), self.get_true_coefs()
