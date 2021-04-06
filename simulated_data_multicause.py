@@ -138,14 +138,14 @@ class copula_simulated_data(object):
         self.tau_nl = tau_nl  # non linear effect coef
         self.coef_true = np.concatenate([tau_l, tau_nl], axis=0)
         self.n = n  # sample size
+        print('.get_data() returns 4 items: treatments, confounders, y_cont, y_bin')
 
     def g_yt(self, t, tau_l, tau_nl, ind=2):
-        '''
+        """
         t: t is n by k matrix
         outputs y
         #always make the treatment 2 modified and squared treatment 1
-        '''
-        self.ind = ind
+        """
         t[:, ind] = [item if item > 0 else 0.7 * item for item in t[:, ind]]
         y = t.dot(tau_l)
         for i, item in enumerate(tau_nl):
@@ -153,8 +153,8 @@ class copula_simulated_data(object):
         return y
 
     def get_data(self):
-        u = np.random.normal(loc=0, scale=1, size=self.n * self.s).reshape(self.n,
-                                                                           self.s)  # mu = rep(0, s), Sigma = diag(s)
+        print('Start: Copula Dataset simulation')
+        u = np.random.normal(loc=0, scale=1, size=self.n * self.s).reshape(self.n, self.s)
         if self.s > 1:
             pca = PCA(n_components=1)
             u1 = pca.fit_transform(u)
@@ -167,14 +167,13 @@ class copula_simulated_data(object):
             loc=0, scale=self.sigma2_y, size=self.n)
         y_binary = [1 if item > 0 else 0 for item in y_continuous]  # very well balanced
 
-        print('Outcomes (Y):\n', y_binary[0:5], '(binary) or ', y_continuous[0:5], '(continuous)')
-
         tr = pd.DataFrame(tr, columns=['t1', 't2', 't3', 't4'])
-        print('Treatments:', tr.shape)
+        print('... Treatments:', tr.shape)
         # print(tr.head())
-        print('Confounders:', u.shape)
+        print('... Confounders:', u.shape)
         # print(u[0:5,:])
-
+        print('... Use .get_true_coefs() to obtain the treatment effects (returns 4 elements)')
+        print('Data Simulation Done!')
         return tr, u, y_continuous, y_binary
 
     def get_true_coefs(self):
@@ -204,15 +203,15 @@ class copula_simulated_data(object):
         ytilde_mean_obs = ytilde_mean_do.reshape(self.k + 1, 1) + ytilde_mean_do_bias
         y_mean_obs = scipy.stats.norm.cdf(ytilde_mean_obs / sigma_ytilde_t)
         effect_obs = (y_mean_obs[0:4] / y_mean_obs[4]).reshape(1, self.k)
+        print('Start: Copula True Treatment Effects')
+        print("... True effect", effect_true)
+        print("... True obs effect", effect_obs)
 
-        print("True effect", effect_true)
-        print("True obs effect", effect_obs)
-
-        print('\nBinary Nonlinear:')
+        print('\n... Binary Nonlinear:')
         # print("B: True treat. effect", ytilde_mean_do_bias.reshape(1,k+1))
-        print("B: True treat. obs effect", ytilde_mean_obs.reshape(1, self.k + 1))
+        print("... B: True treat. obs effect", ytilde_mean_obs.reshape(1, self.k + 1))
 
-        print('\nContinuous Nonlinear')
+        print('\n... Continuous Nonlinear')
         # true treatment effect #
         effect_true_c = self.g_yt(t_choice, self.tau_l, self.tau_nl) - self.g_yt(t2, self.tau_l, self.tau_nl)
         # true treatment effect bias #
@@ -220,7 +219,7 @@ class copula_simulated_data(object):
         # true observed treatment effect #
         effect_obs_c = effect_true_c.reshape(1, self.k) + effect_bias_c
         # print("C: True treat. effect", effect_bias_c)
-        print("C: True treat. obs effect", effect_obs_c)
+        print("... C: True treat. obs effect", effect_obs_c)
 
         return effect_true, effect_obs, ytilde_mean_obs.reshape(1, self.k + 1), effect_obs_c
 
