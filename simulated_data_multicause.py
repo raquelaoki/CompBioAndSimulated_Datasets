@@ -245,3 +245,6 @@ class copula_simulated_data(object):
             eq = eq + coef + item
         print('\nEquation:')
         print(eq)
+
+
+# TODO: Add gwas from copula
