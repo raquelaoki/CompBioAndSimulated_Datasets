@@ -172,9 +172,8 @@ class copula_simulated_data(object):
         print('... Treatments:', tr.shape)
         # print(tr.head())
         print('... Confounders:', u.shape)
-        X = np.concatenate([tr, u], axis=1)
+        X = np.concatenate([tr.values, u.values], 1)
         # print(u[0:5,:])
-        print('... Use .get_true_coefs() to obtain the treatment effects (returns 4 elements)')
         print('Data Simulation Done!')
         return X, y_continuous, y_binary, list(range(tr.shape[1])), self.get_true_coefs()
 
