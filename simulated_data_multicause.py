@@ -75,8 +75,8 @@ class gwas_simulated_data(object):
         y01: binary target
         """
         np.random.seed(self.seed)
-        tc_ = npr.normal(loc=0, scale=0.5 * 0.5, size=int(self.n_causes * prop_tc))
-        tc = np.hstack((np.repeat(0.0, self.n_causes - int(self.n_causes * prop_tc)), tc_))  # True causes
+        tc_ = npr.normal(loc=0, scale=1.5 * 1.5, size=int(self.n_causes * prop_tc))
+        tc = np.hstack((tc_, np.repeat(0.0, self.n_causes - int(self.n_causes * prop_tc))))  # True causes
         # tc.shuffle(tc)
 
         tau = stats.invgamma(3, 1).rvs(3, random_state=99)
