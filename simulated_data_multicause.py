@@ -31,10 +31,10 @@ class gwas_simulated_data(object):
         Due running time, we save the files and load from the pca.txt file
         """
         G0, lambdas = self.sim_genes_TGP(D=3)
-        G1, tc, y01, y, col = self.sim_dataset(G0, lambdas, self.prop_tc)
+        G1, tc, y01, y, col, group = self.sim_dataset(G0, lambdas, self.prop_tc)
         # G, col = self.add_colnames(G1,tc)
         del G0
-        return G1, y, y01, col, tc
+        return G1, y, y01, col, tc, group
 
     def sim_genes_TGP(self, D):
         """
