@@ -220,8 +220,10 @@ class copula_simulated_data(object):
         # print('\n... Continuous Nonlinear')
         # true treatment effect #
         effect_true_c = self.g_yt(t_choice, self.tau_l, self.tau_nl) - self.g_yt(t2, self.tau_l, self.tau_nl)
+        print(effect_true_c)
         # true treatment effect bias #
         effect_bias_c = ((t_choice.dot(np.transpose(coef_mu_u_t))) * self.gamma).reshape(1, self.k)
+        print(effect_bias_c)
         # true observed treatment effect #
         effect_obs_c = effect_true_c.reshape(1, self.k) + effect_bias_c
         # print("C: True treat. effect", effect_bias_c)
