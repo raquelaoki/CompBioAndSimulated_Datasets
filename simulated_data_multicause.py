@@ -101,7 +101,7 @@ class gwas_simulated_data(object):
         print('... Treatments: ', len(col))
         print('... Confounders: ', G.shape[1]-len(col))
         print(' Data Simulation Done!')
-        return G, tc, y01, y, col
+        return G, tc, y01, y, col, tau
 
     def add_colnames(self, data, truecauses):
         """
