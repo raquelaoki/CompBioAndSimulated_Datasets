@@ -12,7 +12,7 @@ X, y, y01,treatement_columns ,treatment_effects = sdata_copula.generate_samples(
 **GWAS simulated dataset**: Sparse Effects 
 ```python
 sdata_gwas = gwas_simulated_data()
-X, y, y01, treatement_columns, treatment_effects  = sdata_gwas.generate_samples()
+X, y, y01, treatement_columns, treatment_effects, group  = sdata_gwas.generate_samples()
 ```
 
 ## References:
