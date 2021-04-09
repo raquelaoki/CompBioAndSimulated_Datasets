@@ -181,7 +181,7 @@ class copula_simulated_data(object):
         y_binary = [1 if item > y_continuous.mean() else 0 for item in y_continuous]  # very well balanced
 
         tr = pd.DataFrame(tr, columns=['t1', 't2', 't3', 't4'])
-        print('... Treatments:', tr.shape, tr.head())
+        print('... Treatments:', tr.shape)
         print('... Confounders:', u.shape)
         print('... Target (y):', np.sum(np.array(y_binary))/len(y_binary))
 
@@ -259,5 +259,15 @@ class copula_simulated_data(object):
         print('\nEquation:')
         print(eq)
 
+
+class linear_simulated_Data(object):
+    def __init__(self, n = 10000):
+        X = np.random.normal(0,1,n*3)
+        y = np.random.binomial(1,0.5,n)
+        T = [1 if i==1 else 0 for i in y]
+        for j,i in enumerate(y):
+            if i ==1:
+                X[j,:] = X[j,:]+1
+        return X, y, T
 
 # TODO: Add gwas from copula
