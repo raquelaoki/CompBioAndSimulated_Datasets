@@ -137,7 +137,7 @@ class copula_simulated_data(object):
     # https://github.com/JiajingZ/CopulaSensitivity/blob/CopSens/simulation/GaussianT_BinaryY_nonlinearYT/GaussianT_BinaryY_nonlinearYT_RR.R
     # adapted from R to python
     def __init__(self, k=4, s=10, B=[2, 0.5, -0.4, 0.2], gamma=2.8, sigma2_t=1, sigma2_y=1, tau_l=[3, -1, 1, -0.06],
-                 tau_nl=[-4], n=10000):
+                 tau_nl=[-4], n=10000, seed=10):
 
         self.k = k  # number of treatments
         self.s = s  # number of confounders
@@ -150,6 +150,7 @@ class copula_simulated_data(object):
         self.tau_nl = tau_nl  # non linear effect coef
         self.coef_true = np.concatenate([tau_l, tau_nl], axis=0)
         self.n = n  # sample size
+        self.seed = seed
         print('Copula simulated data initialized!')
 
     def g_yt(self, t, tau_l, tau_nl, ind=2):
@@ -165,6 +166,7 @@ class copula_simulated_data(object):
         return y
 
     def generate_samples(self):
+        np.random.seed(self.seed)
         u = np.random.normal(loc=0, scale=1, size=self.n * self.s).reshape(self.n, self.s)
         if self.s > 1:
             pca = PCA(n_components=1)
