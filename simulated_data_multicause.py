@@ -98,8 +98,15 @@ class gwas_simulated_data(object):
         G, col = self.add_colnames(G0, tc)
         # print('im here', G.shape)
         y = y0 + y1 + y2
-        print('... Treatments: ', len(col))
+
+        prop = []
+        for i in col:
+            prop.append(np.sum(G[i])/G.shape[0])
+
+        print('... Treatments: ', len(col), prop)
         print('... Confounders: ', G.shape[1]-len(col))
+        print('... Target (y) :', np.sum(y01)/len(y01))
+        print('... Sample Size:', G.shape[0])
         print(' Data Simulation Done!')
         return G, tc, y01, y, col, tau
 
@@ -172,11 +179,11 @@ class copula_simulated_data(object):
         y_binary = [1 if item > 0 else 0 for item in y_continuous]  # very well balanced
 
         tr = pd.DataFrame(tr, columns=['t1', 't2', 't3', 't4'])
-        print('... Treatments:', tr.shape)
-        # print(tr.head())
+        print('... Treatments:', tr.shape, tr.head())
         print('... Confounders:', u.shape)
+        print('... Target (y):', np.sum(np.array(y_binary))/len(y_binary))
+
         X = np.concatenate([tr.values, u], 1)
-        # print(u[0:5,:])
         print('Data Simulation Done!')
         true_coef = self.get_true_coefs()[0]
         true_coef = np.array(true_coef)[0]
