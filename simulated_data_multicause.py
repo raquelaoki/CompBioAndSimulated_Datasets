@@ -187,7 +187,11 @@ class copula_simulated_data(object):
         print('Data Simulation Done!')
         true_coef = self.get_true_coefs()[0]
         true_coef = np.array(true_coef)[0]
-        return X, np.array(y_continuous), np.array(y_binary), list(range(tr.shape[1])), true_coef
+        tr01 = tr.copy()
+        for col in range(tr.shape[1]):
+            tr01[col] = [1 if i > 0 else 0 for i in tr[col].values]
+        X01 = np.concatenate([tr01.values, u], 1)
+        return X, np.array(y_continuous), np.array(y_binary), list(range(tr.shape[1])), true_coef, X01
 
     def get_true_coefs(self):
         aux1 = np.linalg.solve(np.array(self.B).reshape(self.k, 1) * (
