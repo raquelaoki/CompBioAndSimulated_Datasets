@@ -176,7 +176,7 @@ class copula_simulated_data(object):
 
         y_continuous = self.g_yt(tr, self.tau_l, self.tau_nl) + (u1 * self.gamma).reshape(self.n, ) + np.random.normal(
             loc=0, scale=self.sigma2_y, size=self.n)
-        y_binary = [1 if item > 0 else 0 for item in y_continuous]  # very well balanced
+        y_binary = [1 if item > y_continuous.mean() else 0 for item in y_continuous]  # very well balanced
 
         tr = pd.DataFrame(tr, columns=['t1', 't2', 't3', 't4'])
         print('... Treatments:', tr.shape, tr.head())
