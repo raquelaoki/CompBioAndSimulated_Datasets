@@ -101,7 +101,7 @@ class gwas_simulated_data(object):
 
         prop = []
         for i in col:
-            prop.append(np.sum(G[i])/G.shape[0])
+            prop.append(np.sum(G[:, i])/G.shape[0])
 
         print('... Treatments: ', len(col), prop)
         print('... Confounders: ', G.shape[1]-len(col))
