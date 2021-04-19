@@ -75,7 +75,7 @@ class gwas_simulated_data(object):
         y01: binary target
         """
         np.random.seed(self.seed)
-        tc_ = npr.normal(loc=0, scale=0.5 * 0.5, size=int(self.n_causes * prop_tc))
+        tc_ = npr.normal(loc=0, scale=0.5 * 0.5, size=np.min([int(self.n_causes * prop_tc),1]))
         tc = np.hstack((tc_, np.repeat(0.0, self.n_causes - int(self.n_causes * prop_tc))))  # True causes
         # tc.shuffle(tc)
 
@@ -103,7 +103,7 @@ class gwas_simulated_data(object):
         for i in col:
             prop.append(np.sum(G.iloc[i])/G.shape[0])
 
-        print('... Treatments: ', len(col), prop)
+        print('... Treatments: ', len(col), ' proportions ',prop)
         print('... Confounders: ', G.shape[1]-len(col))
         print('... Target (y) :', np.sum(y01)/len(y01))
         print('... Sample Size:', G.shape[0])
@@ -260,14 +260,13 @@ class copula_simulated_data(object):
         print(eq)
 
 
-class linear_simulated_Data(object):
-    def __init__(self, n = 10000):
-        X = np.random.normal(0,1,n*3)
-        y = np.random.binomial(1,0.5,n)
-        T = [1 if i==1 else 0 for i in y]
-        for j,i in enumerate(y):
-            if i ==1:
-                X[j,:] = X[j,:]+1
-        return X, y, T
+class IHDP100_simulated_Data(object):
+    def __init__(self, ):
+        #https://www.fredjo.com/
+        print('in progress')
 
 # TODO: Add gwas from copula
+
+class copula_sparse_setting(object)
+    def __init__(self):
+        print('in progress')
