@@ -79,8 +79,6 @@ class gwas_simulated_data(object):
         np.random.seed(self.seed)
         tc_ = npr.normal(loc=0, scale=0.5 * 0.5, size=self.true_causes)
         tc = np.hstack((tc_, np.repeat(0.0, self.confounders)))  # True causes
-        #tc.shuffle(tc)
-        print('TESTING, ', self.true_causes, self.confounders)
         tau = stats.invgamma(3, 1).rvs(3, random_state=99)
         sigma = np.zeros(self.n_units)
         sigma = [tau[0] if lambdas[j] == 0 else sigma[j] for j in range(len(sigma))]
@@ -98,7 +96,6 @@ class gwas_simulated_data(object):
         y01 = [npr.binomial(1, p[0][i], 1)[0] for i in range(len(p[0]))]
         y01 = np.asarray(y01)
         G, col = self.add_colnames(G0, tc)
-        print('im here', col)
         y = y0 + y1 + y2
 
         prop = []
