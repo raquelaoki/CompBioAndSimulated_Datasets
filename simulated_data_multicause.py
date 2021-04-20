@@ -267,6 +267,6 @@ class IHDP100_simulated_Data(object):
 
 # TODO: Add gwas from copula
 
-class copula_sparse_setting(object)
+class copula_sparse_setting(object):
     def __init__(self):
         print('in progress')
