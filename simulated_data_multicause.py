@@ -12,16 +12,21 @@ class gwas_simulated_data(object):
     # Reference:
     # https://github.com/raquelaoki/ParKCa/blob/master/src/datapreprocessing.py
 
-    def __init__(self, n_units=10000, n_causes=100, seed=4, pca_path='data//tgp_pca2.txt', prop_tc=0.1):
+    def __init__(self, n_units=10000, n_causes=100, seed=4, pca_path='data//tgp_pca2.txt', prop_tc=0.1,
+                 true_causes=None):
         self.n_units = n_units
         self.n_causes = n_causes
-        self.true_causes = np.min([1,int(n_causes*prop_tc)])
+        if true_causes is None:
+            self.true_causes = np.max([1, int(n_causes * prop_tc)])
+        else:
+            self.true_causes = true_causes
         self.confounders = self.n_causes - self.true_causes
         self.seed = seed
         self.pca_path = pca_path
         self.S = np.loadtxt(self.pca_path, delimiter=',')
         self.prop_tc = prop_tc
         print('GWAS simulated data initialized!')
+        print('... ', self.true_causes, 'true causes and ', self.confounders, ' confounders')
 
     def generate_samples(self):
         """
@@ -100,11 +105,11 @@ class gwas_simulated_data(object):
 
         prop = []
         for i in col:
-            prop.append(np.sum(G.iloc[i])/G.shape[0])
+            prop.append(np.sum(G.iloc[i]) / G.shape[0])
 
-        print('... Treatments: ', len(col), ' proportions ',prop)
-        print('... Confounders: ', G.shape[1]-len(col))
-        print('... Target (y) :', np.sum(y01)/len(y01))
+        print('... Treatments: ', len(col), ' proportions ', prop)
+        print('... Confounders: ', G.shape[1] - len(col))
+        print('... Target (y) :', np.sum(y01) / len(y01))
         print('... Sample Size:', G.shape[0])
         print(' Data Simulation Done!')
         return G, tc, y01, y, col, tau
@@ -182,7 +187,7 @@ class copula_simulated_data(object):
         tr = pd.DataFrame(tr, columns=['t1', 't2', 't3', 't4'])
         print('... Treatments:', tr.shape)
         print('... Confounders:', u.shape)
-        print('... Target (y):', np.sum(np.array(y_binary))/len(y_binary))
+        print('... Target (y):', np.sum(np.array(y_binary)) / len(y_binary))
 
         X = np.concatenate([tr.values, u], 1)
         print('Data Simulation Done!')
@@ -217,13 +222,13 @@ class copula_simulated_data(object):
         ytilde_mean_obs = ytilde_mean_do.reshape(self.k + 1, 1) + ytilde_mean_do_bias
         y_mean_obs = scipy.stats.norm.cdf(ytilde_mean_obs / sigma_ytilde_t)
         effect_obs = (y_mean_obs[0:4] / y_mean_obs[4]).reshape(1, self.k)
-        #print('Start: Copula True Treatment Effects')
-        #print("... True effect", effect_true)
-        #print("... True obs effect", effect_obs)
+        # print('Start: Copula True Treatment Effects')
+        # print("... True effect", effect_true)
+        # print("... True obs effect", effect_obs)
 
-        #print('\n... Binary Nonlinear:')
+        # print('\n... Binary Nonlinear:')
         # print("B: True treat. effect", ytilde_mean_do_bias.reshape(1,k+1))
-        #print("... B: True treat. obs effect", ytilde_mean_obs.reshape(1, self.k + 1))
+        # print("... B: True treat. obs effect", ytilde_mean_obs.reshape(1, self.k + 1))
 
         # print('\n... Continuous Nonlinear')
         # true treatment effect #
@@ -261,8 +266,9 @@ class copula_simulated_data(object):
 
 class IHDP100_simulated_Data(object):
     def __init__(self, ):
-        #https://www.fredjo.com/
+        # https://www.fredjo.com/
         print('in progress')
+
 
 # TODO: Add gwas from copula
 
