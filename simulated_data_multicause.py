@@ -83,6 +83,7 @@ class gwas_simulated_data(object):
         print('TESTING, ', self.true_causes, self.confounders)
         tau = stats.invgamma(3, 1).rvs(3, random_state=99)
         sigma = np.zeros(self.n_units)
+        pritn('?')
         sigma = [tau[0] if lambdas[j] == 0 else sigma[j] for j in range(len(sigma))]
         sigma = [tau[1] if lambdas[j] == 1 else sigma[j] for j in range(len(sigma))]
         sigma = [tau[2] if lambdas[j] == 2 else sigma[j] for j in range(len(sigma))]
