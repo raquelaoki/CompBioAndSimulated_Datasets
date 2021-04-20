@@ -15,6 +15,8 @@ class gwas_simulated_data(object):
     def __init__(self, n_units=10000, n_causes=100, seed=4, pca_path='data//tgp_pca2.txt', prop_tc=0.1):
         self.n_units = n_units
         self.n_causes = n_causes
+        self.true_causes = np.min([1,int(n_causes*prop_tc)])
+        self.confounders = self.n_causes - self.true_causes
         self.seed = seed
         self.pca_path = pca_path
         self.S = np.loadtxt(self.pca_path, delimiter=',')
@@ -75,8 +77,8 @@ class gwas_simulated_data(object):
         y01: binary target
         """
         np.random.seed(self.seed)
-        tc_ = npr.normal(loc=0, scale=0.5 * 0.5, size=np.min([int(self.n_causes * prop_tc),1]))
-        tc = np.hstack((tc_, np.repeat(0.0, self.n_causes - int(self.n_causes * prop_tc))))  # True causes
+        tc_ = npr.normal(loc=0, scale=0.5 * 0.5, size=self.true_causes)
+        tc = np.hstack((tc_, np.repeat(0.0, self.self.confounders)))  # True causes
         # tc.shuffle(tc)
 
         tau = stats.invgamma(3, 1).rvs(3, random_state=99)
