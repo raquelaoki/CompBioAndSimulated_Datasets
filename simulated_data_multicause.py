@@ -239,10 +239,11 @@ class copula_simulated_data(object):
         print(effect_bias_c)
         # true observed treatment effect #
         effect_obs_c = effect_true_c.reshape(1, self.k) + effect_bias_c
+        print(effect_obs_c)
         # print("C: True treat. effect", effect_bias_c)
         # print("... C: True treat. obs effect", effect_obs_c)
         # return effect_true, effect_obs, ytilde_mean_obs.reshape(1, self.k + 1), effect_obs_c
-        return effect_obs_c
+        return effect_bias_c
 
     def print_equation(self):
         eq = 'g(T)='
