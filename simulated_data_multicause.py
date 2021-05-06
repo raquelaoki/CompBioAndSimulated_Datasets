@@ -265,14 +265,20 @@ class copula_simulated_data(object):
         print(eq)
 
 
-class IHDP100_simulated_Data(object):
-    def __init__(self, ):
-        # https://www.fredjo.com/
-        print('in progress')
+class ihdp_data(object):
+    # source code: https://github.com/AMLab-Amsterdam/CEVAE.git
+    def __init__(self, id=1, path='/content/CEVAE/datasets/IHDP/'):
+        data = pd.read_csv(path + 'csv/ihdp_npci_' + str(id) + '.csv', sep=',', header=None)
+        columns = ['treatment', 'y_factual', 'y_cfactual', 'mu0', 'mu1', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8',
+                   'x9', 'x10', 'x11', 'x12', 'x13', 'x14', 'x15', 'x16', 'x17', 'x18', 'x19', 'x20', 'x21', 'x22',
+                   'x23', 'x24', 'x25']
+        data.columns = columns
+        self.data = data
+        print('IHCP initilized!')
 
-
-# TODO: Add gwas from copula
-
-class copula_sparse_setting(object):
-    def __init__(self):
-        print('in progress')
+    def generate_samples(self):
+        X = self.data.drop(['y_factual', 'y_cfactual', 'mu0', 'mu1'], axis=1)
+        y = self.data['y_factual'].values
+        col = [0]
+        tc = self.data['mu1'].mean() - self.data['mu0'].mean()
+        return X, y, col, tc
