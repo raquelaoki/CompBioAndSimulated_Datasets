@@ -26,7 +26,6 @@ class gwas_simulated_data(object):
         self.S = np.loadtxt(self.pca_path, delimiter=',')
         self.prop_tc = prop_tc
         print('GWAS simulated data initialized!')
-        print('... ', self.true_causes, 'true causes and ', self.confounders, ' confounders')
 
     def generate_samples(self):
         """
@@ -108,7 +107,7 @@ class gwas_simulated_data(object):
             prop.append(np.sum(G.iloc[i]) / G.shape[0])
 
         print('... Treatments: ', len(col), ' proportions ', prop)
-        print('... Confounders: ', G.shape[1] - len(col))
+        print('... Covariates: ', G.shape[1] - len(col))
         print('... Target (y) :', np.sum(y01) / len(y01))
         print('... Sample Size:', G.shape[0])
         print(' Data Simulation Done!')
