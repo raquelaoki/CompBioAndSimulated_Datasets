@@ -39,6 +39,7 @@ class gwas_simulated_data(object):
         G0, lambdas = self.sim_genes_TGP(D=3)
         G1, tc, y01, y, col, group = self.sim_dataset(G0, lambdas, self.prop_tc)
         # G, col = self.add_colnames(G1,tc)
+        y = y.reshape(self.n_units, -1)
         del G0
         return G1, y, y01, col, tc, group
 
