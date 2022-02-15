@@ -6,6 +6,10 @@ from sklearn.cluster import KMeans
 from scipy import sparse, stats
 from scipy.special import expit
 import scipy.stats
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class gwas_simulated_data(object):
@@ -25,7 +29,7 @@ class gwas_simulated_data(object):
         self.pca_path = pca_path
         self.S = np.loadtxt(self.pca_path, delimiter=',')
         self.prop_tc = prop_tc
-        print('GWAS simulated data initialized!')
+        logging.debug('Dataset - GWAS initialized!')
 
     def generate_samples(self):
         """
@@ -107,10 +111,10 @@ class gwas_simulated_data(object):
         for i in col:
             prop.append(np.sum(G.iloc[i]) / G.shape[0])
 
-        print('... Covariates: ', G.shape[1] - len(col))
-        print('... Target (y) :', np.sum(y01) / len(y01))
-        print('... Sample Size:', G.shape[0])
-        print(' Data Simulation Done!')
+        logging.debug('... Covariates: %i', G.shape[1] - len(col))
+        logging.debug('... Target (y) : %f', np.sum(y01) / len(y01))
+        logging.debug('... Sample Size: %i', G.shape[0])
+        logging.debug('Dataset - GWAS Done!')
         return G, tc, y01, y, col, tau
 
     def add_colnames(self, data, truecauses):
