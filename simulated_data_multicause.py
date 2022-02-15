@@ -107,7 +107,6 @@ class gwas_simulated_data(object):
         for i in col:
             prop.append(np.sum(G.iloc[i]) / G.shape[0])
 
-        print('... Treatments: ', len(col), ' proportions ', prop)
         print('... Covariates: ', G.shape[1] - len(col))
         print('... Target (y) :', np.sum(y01) / len(y01))
         print('... Sample Size:', G.shape[0])
