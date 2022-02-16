@@ -31,7 +31,7 @@ class gwas_simulated_data(object):
         self.prop_tc = prop_tc
         logging.debug('Dataset - GWAS initialized!')
 
-    def generate_samples(self):
+    def generate_samples(self, prop=[0.2, 0.2, 0.05]):
         """
         Input:
         n_units, n_causes: dimentions
@@ -39,15 +39,16 @@ class gwas_simulated_data(object):
         y: output simulated and truecases for each datset are together in a single matrix
         Note: There are options to load the data from vcf format and run the pca
         Due running time, we save the files and load from the pca.txt file
+        G = X
         """
-        G0, lambdas = self.sim_genes_TGP(D=3)
+        G0, lambdas = self.sim_genes_TGP(D=3, prop=prop)
         G1, tc, y01, y, col, group = self.sim_dataset(G0, lambdas, self.prop_tc)
         # G, col = self.add_colnames(G1,tc)
         y = y.reshape(self.n_units, -1)
         del G0
         return G1, y, y01, col, tc, group
 
-    def sim_genes_TGP(self, D):
+    def sim_genes_TGP(self, D, prop=[0.2, 0.2, 0.05]):
         """
         #Adapted from Deconfounder's authors
         generate the simulated data
@@ -60,11 +61,12 @@ class gwas_simulated_data(object):
         np.random.seed(self.seed)
         S = expit(self.S)
         Gammamat = np.zeros((self.n_causes, 3))
-        Gammamat[:, 0] = 0.2 * npr.uniform(size=self.n_causes)  # 0.45
-        Gammamat[:, 1] = 0.2 * npr.uniform(size=self.n_causes)  # 0.45
-        Gammamat[:, 2] = 0.05 * np.ones(self.n_causes)
+        Gammamat[:, 0] = prop[0] * npr.uniform(size=self.n_causes)  # 0.2
+        Gammamat[:, 1] = prop[1] * npr.uniform(size=self.n_causes)  # 0.2
+        Gammamat[:, 2] = prop[2] * np.ones(self.n_causes)
         S = np.column_stack((S[npr.choice(S.shape[0], size=self.n_units, replace=True),], \
                              np.ones(self.n_units)))
+        #print(S[0:5,0:5])
         F = S.dot(Gammamat.T)
         # it was 2 instead of 1: goal is make SNPs binary
         G = npr.binomial(1, F)
@@ -86,6 +88,7 @@ class gwas_simulated_data(object):
         y01: binary target
         """
         np.random.seed(self.seed)
+
         tc_ = npr.normal(loc=0, scale=0.5 * 0.5, size=self.true_causes)
         tc = np.hstack((tc_, np.repeat(0.0, self.confounders)))  # True causes
         tau = stats.invgamma(3, 1).rvs(3, random_state=99)
@@ -107,9 +110,9 @@ class gwas_simulated_data(object):
         G, col = self.add_colnames(G0, tc)
         y = y0 + y1 + y2
 
-        prop = []
-        for i in col:
-            prop.append(np.sum(G.iloc[i]) / G.shape[0])
+        #prop = []
+        #for i in col:
+        #    prop.append(np.sum(G.iloc[i]) / G.shape[0])
 
         logging.debug('... Covariates: %i', G.shape[1] - len(col))
         logging.debug('... Target (y) : %f', np.sum(y01) / len(y01))
