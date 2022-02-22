@@ -103,13 +103,11 @@ class gwas_simulated_data(object):
         y1 = (np.sqrt(np.var(y0)) / np.sqrt(0.4)) * (np.sqrt(0.4) / np.sqrt(np.var(l1))) * l1
         e = npr.normal(0, sigma, self.n_units).reshape(1, -1)
         y2 = (np.sqrt(np.var(y0)) / np.sqrt(0.4)) * (np.sqrt(0.2) / np.sqrt(np.var(e))) * e
-        y = y0 + y1 + y2
         p = 1 / (1 + np.exp(y0 + y1 + y2))
-
-        y01 = np.zeros(len(p[0]))
         y01 = [npr.binomial(1, p[0][i], 1)[0] for i in range(len(p[0]))]
         y01 = np.asarray(y01)
         G, col = self.add_colnames(G0, tc)
+
         y = y0 + y1 + y2
 
         logger.debug('... Covariates: %i', G.shape[1] - len(col))
