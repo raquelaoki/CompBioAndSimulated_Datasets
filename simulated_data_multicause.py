@@ -31,10 +31,11 @@ class gwas_simulated_data(object):
         self.prop_tc = prop_tc
         self.unit_test = unit_test
         if self.unit_test:
-            logging.basicConfig(level=logging.DEBUG)
+            print('debug')
+            logger.basicConfig(level=logging.DEBUG)
         else:
-            logging.basicConfig(level=logging.WARNING)
-        logging.debug('Dataset - GWAS initialized!')
+            logger.basicConfig(level=logging.WARNING)
+        logger.debug('Dataset - GWAS initialized!')
 
     def generate_samples(self, prop=[0.2, 0.2, 0.05]):
         """
