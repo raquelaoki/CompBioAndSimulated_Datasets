@@ -31,10 +31,9 @@ class gwas_simulated_data(object):
         self.prop_tc = prop_tc
         self.unit_test = unit_test
         if self.unit_test:
-            print('debug')
-            logger.basicConfig(level=logging.DEBUG)
+            logging.basicConfig(level=logging.DEBUG)
         else:
-            logger.basicConfig(level=logging.WARNING)
+            logging.basicConfig(level=logging.WARNING)
         logger.debug('Dataset - GWAS initialized!')
 
     def generate_samples(self, prop=[0.2, 0.2, 0.05]):
@@ -116,13 +115,13 @@ class gwas_simulated_data(object):
         G, col = self.add_colnames(G0, tc)
         y = y0 + y1 + y2
 
-        logging.debug('... Covariates: %i', G.shape[1] - len(col))
-        logging.debug('... Target (y) : %f', np.sum(y01) / len(y01))
-        logging.debug('... Sample Size: %i', G.shape[0])
+        logger.debug('... Covariates: %i', G.shape[1] - len(col))
+        logger.debug('... Target (y) : %f', np.sum(y01) / len(y01))
+        logger.debug('... Sample Size: %i', G.shape[0])
         if len(col) == 1:
             T = G.iloc[:, col[0]].values
-            logging.debug('... Proportion of T: %f', sum(T) / len(T))
-        logging.debug('Dataset - GWAS Done!')
+            logger.debug('... Proportion of T: %f', sum(T) / len(T))
+        logger.debug('Dataset - GWAS Done!')
         return G, tc, y01, y, col, tau
 
     def add_colnames(self, data, truecauses):
