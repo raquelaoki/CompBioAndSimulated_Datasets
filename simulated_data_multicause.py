@@ -66,7 +66,7 @@ class gwas_simulated_data(object):
         Gammamat[:, 2] = prop[2] * np.ones(self.n_causes)
         S = np.column_stack((S[npr.choice(S.shape[0], size=self.n_units, replace=True),], \
                              np.ones(self.n_units)))
-        #print(S[0:5,0:5])
+        # print(S[0:5,0:5])
         F = S.dot(Gammamat.T)
         # it was 2 instead of 1: goal is make SNPs binary
         G = npr.binomial(1, F)
@@ -110,13 +110,12 @@ class gwas_simulated_data(object):
         G, col = self.add_colnames(G0, tc)
         y = y0 + y1 + y2
 
-        #prop = []
-        #for i in col:
-        #    prop.append(np.sum(G.iloc[i]) / G.shape[0])
-
         logging.debug('... Covariates: %i', G.shape[1] - len(col))
         logging.debug('... Target (y) : %f', np.sum(y01) / len(y01))
         logging.debug('... Sample Size: %i', G.shape[0])
+        if len(col) == 1:
+            T = G.iloc[:, col[0]].values
+            logging.debug('... Proportion of T: %f', sum(T) / len(T))
         logging.debug('Dataset - GWAS Done!')
         return G, tc, y01, y, col, tau
 
