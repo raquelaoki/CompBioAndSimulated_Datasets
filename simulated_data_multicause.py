@@ -9,7 +9,7 @@ import scipy.stats
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 
 class gwas_simulated_data(object):
@@ -17,7 +17,7 @@ class gwas_simulated_data(object):
     # https://github.com/raquelaoki/ParKCa/blob/master/src/datapreprocessing.py
 
     def __init__(self, n_units=10000, n_causes=100, seed=4, pca_path='data//tgp_pca2.txt', prop_tc=0.1,
-                 true_causes=None):
+                 true_causes=None, unit_test=False):
         self.n_units = n_units
         self.n_causes = n_causes
         if true_causes is None:
@@ -29,6 +29,11 @@ class gwas_simulated_data(object):
         self.pca_path = pca_path
         self.S = np.loadtxt(self.pca_path, delimiter=',')
         self.prop_tc = prop_tc
+        self.unit_test = unit_test
+        if self.unit_test:
+            logging.basicConfig(level=logging.DEBUG)
+        else:
+            logging.basicConfig(level=logging.WARNING)
         logging.debug('Dataset - GWAS initialized!')
 
     def generate_samples(self, prop=[0.2, 0.2, 0.05]):
