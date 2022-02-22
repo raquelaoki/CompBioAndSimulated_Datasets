@@ -9,8 +9,6 @@ import scipy.stats
 import logging
 
 logger = logging.getLogger(__name__)
-#logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.WARNING)
 
 class gwas_simulated_data(object):
     # Reference:
