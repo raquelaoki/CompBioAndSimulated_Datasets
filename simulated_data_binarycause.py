@@ -43,7 +43,8 @@ class gwas_simulated_data(object):
         Due running time, we save the files and load from the pca.txt file
         G = X
         """
-        x, y, t, tau = self.sim_dataset(self.sim_genes_TGP(D=3, prop=prop))
+        G0, lambdas = self.sim_genes_TGP(D=3, prop=prop)
+        x, y, t, tau = self.sim_dataset(G0, lambdas)
         y = y.reshape(self.n_units, -1)
         return x, y, t, tau
 
@@ -151,11 +152,15 @@ class ihdp_data(object):
                    'x23', 'x24', 'x25']
         data.columns = columns
         self.data = data
-        print('IHCP initilized!')
+        logger.debug('Dataset - IHDP initialized!')
 
     def generate_samples(self):
         X = self.data.drop(['y_factual', 'y_cfactual', 'mu0', 'mu1'], axis=1)
         y = self.data['y_factual'].values
         col = [0]
-        tc = self.data['mu1'].mean() - self.data['mu0'].mean()
-        return X, y, col, tc
+        tau = self.data['mu1'].mean() - self.data['mu0'].mean()
+
+        t = X.iloc[:, col].values.reshape(-1)
+        X.drop('treatment', axis=1, inplace=True)
+        logger.debug('Dataset - IHDP Done!')
+        return X, y, t, tau
