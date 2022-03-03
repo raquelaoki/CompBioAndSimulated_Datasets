@@ -107,7 +107,7 @@ class gwas_simulated_data(object):
         G, col = self.add_colnames(G0, tc)
 
         treatment = G.iloc[:, col[0]].values.reshape(-1)
-        G.drop(col[0], axis=1, inplace=True)
+        G.drop([0], axis=1, inplace=True)
 
         y = y0 + y1 + y2
 
