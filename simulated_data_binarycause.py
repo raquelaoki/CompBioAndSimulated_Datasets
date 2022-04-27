@@ -152,6 +152,7 @@ class ihdp_data(object):
                    'x23', 'x24', 'x25']
         data.columns = columns
         self.data = data
+        #self.binfeat = list(range(6, 25))
         logger.debug('Dataset - IHDP initialized!')
 
     def generate_samples(self):
@@ -163,4 +164,6 @@ class ihdp_data(object):
         t = X.iloc[:, col].values.reshape(-1)
         X.drop('treatment', axis=1, inplace=True)
         logger.debug('Dataset - IHDP Done!')
+        #for col in self.binfeat:
+        #    X[:, col][X[:, col] == 2] = 0
         return X, y, t, tau
