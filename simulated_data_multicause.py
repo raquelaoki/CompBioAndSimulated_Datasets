@@ -1,14 +1,16 @@
+import logging
 import numpy as np
-import pandas as pd
 import numpy.random as npr
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
+import pandas as pd
+import scipy.stats
+
 from scipy import sparse, stats
 from scipy.special import expit
-import scipy.stats
-import logging
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 
 logger = logging.getLogger(__name__)
+
 
 class gwas_simulated_data(object):
     # Reference:
@@ -160,7 +162,7 @@ class copula_simulated_data(object):
         self.coef_true = np.concatenate([tau_l, tau_nl], axis=0)
         self.n = n  # sample size
         self.seed = seed
-        print('Copula simulated data initialized!')
+        logger.debug('Copula simulated data initialized!')
 
     def g_yt(self, t, tau_l, tau_nl, ind=2):
         """
@@ -190,12 +192,12 @@ class copula_simulated_data(object):
         y_binary = [1 if item > y_continuous.mean() else 0 for item in y_continuous]  # very well balanced
 
         tr = pd.DataFrame(tr, columns=['t1', 't2', 't3', 't4'])
-        print('... Treatments:', tr.shape)
-        print('... Confounders:', u.shape)
-        print('... Target (y):', np.sum(np.array(y_binary)) / len(y_binary))
+        logger.debug('... Treatments:', tr.shape)
+        logger.debug('... Confounders:', u.shape)
+        logger.debug('... Target (y):', np.sum(np.array(y_binary)) / len(y_binary))
 
         X = np.concatenate([tr.values, u], 1)
-        print('Data Simulation Done!')
+        logger.debug('Data Simulation Done!')
         true_coef = self.get_true_coefs()[0]
         true_coef = np.array(true_coef)[0]
         return X, np.array(y_continuous), np.array(y_binary), list(range(tr.shape[1])), true_coef
@@ -238,13 +240,13 @@ class copula_simulated_data(object):
         # print('\n... Continuous Nonlinear')
         # true treatment effect #
         effect_true_c = self.g_yt(t_choice, self.tau_l, self.tau_nl) - self.g_yt(t2, self.tau_l, self.tau_nl)
-        print(effect_true_c)
+        logger.debug(effect_true_c)
         # true treatment effect bias #
         effect_bias_c = ((t_choice.dot(np.transpose(coef_mu_u_t))) * self.gamma).reshape(1, self.k)
-        print(effect_bias_c)
+        logger.debug(effect_bias_c)
         # true observed treatment effect #
         effect_obs_c = effect_true_c.reshape(1, self.k) + effect_bias_c
-        print(effect_obs_c)
+        logger.debug(effect_obs_c)
         # print("C: True treat. effect", effect_bias_c)
         # print("... C: True treat. obs effect", effect_obs_c)
         # return effect_true, effect_obs, ytilde_mean_obs.reshape(1, self.k + 1), effect_obs_c
@@ -279,7 +281,7 @@ class ihdp_data(object):
                    'x23', 'x24', 'x25']
         data.columns = columns
         self.data = data
-        print('IHCP initilized!')
+        logger.debug('IHCP initilized!')
 
     def generate_samples(self):
         X = self.data.drop(['y_factual', 'y_cfactual', 'mu0', 'mu1'], axis=1)

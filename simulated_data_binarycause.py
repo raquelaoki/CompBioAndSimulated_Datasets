@@ -1,14 +1,16 @@
+import logging
 import numpy as np
-import pandas as pd
 import numpy.random as npr
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
+import pandas as pd
+import scipy.stats
+
 from scipy import sparse, stats
 from scipy.special import expit
-import scipy.stats
-import logging
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 
 logger = logging.getLogger(__name__)
+
 
 class gwas_simulated_data(object):
     # Reference:
