@@ -16,7 +16,7 @@ class gwas_simulated_data(object):
     # Reference:
     # https://github.com/raquelaoki/ParKCa/blob/master/src/datapreprocessing.py
 
-    def __init__(self, n_units=10000, n_causes=100, seed=4, pca_path='data//tgp_pca2.txt', prop_tc=0.1,
+    def __init__(self, n_units=10000, n_causes=100, seed=4, pca_path='data/tgp_pca2.txt', prop_tc=0.1,
                  true_causes=None, unit_test=False):
         self.n_units = n_units
         self.n_causes = n_causes
@@ -27,7 +27,10 @@ class gwas_simulated_data(object):
         self.confounders = self.n_causes - self.true_causes
         self.seed = seed
         self.pca_path = pca_path
-        self.S = np.loadtxt(self.pca_path, delimiter=',')
+        try:
+            self.S = np.loadtxt(self.pca_path, delimiter=',')
+        except:
+            self.S = np.loadtxt('M3E2/CompBioAndSimulated_Datasets' + self.pca_path, delimiter=',')
         self.prop_tc = prop_tc
         self.unit_test = unit_test
         if self.unit_test:
